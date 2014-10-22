@@ -33,15 +33,17 @@ public class MainClass {
 	double e = 0.0; // estimate error
 	double sigma = 0.0; // standard deviation
 	int error = 0; // number of errors
-	List<String> tPermutations = new ArrayList<String>(); // t-random
-	// permutations
-	String inputData1[][]; // inputData which contains entire grid
+	List<String> tPermutations = new ArrayList<String>(); // t-random permutations
+	int rows = 0, cols = 0;
+	ArrayList<ArrayList<String>> inputData;
+	ArrayList<ArrayList<String>> inputData1; // inputData which contains entire grid
 	ArrayList<ArrayList<String>> examples; // examples from the given grid
 
 	// List<InputData[]> chunks = new ArrayList<InputData[]>();
 	ArrayList<ArrayList<ArrayList<String>>> chunks = new ArrayList<ArrayList<ArrayList<String>>>();
 	ArrayList<Distance> distLabel = new ArrayList<Distance>();
-
+	ArrayList<Distance> dotLabel = new ArrayList<Distance>();
+	
 	static class InputData {
 		int x;
 		int y;
@@ -50,6 +52,7 @@ public class MainClass {
 
 	}
 
+	@SuppressWarnings("unchecked")
 	public static void main(String[] args) throws IOException {
 		// TODO Auto-generated method stub
 
@@ -101,25 +104,33 @@ public class MainClass {
 			 * including examples examples : examples given in a grid
 			 */
 			mainClass.input = new Scanner(new File(mainClass.strFileName2));
-			int rows = 0, cols = 0;
+			
 
-			rows = Integer.parseInt(mainClass.input.next());
-			cols = Integer.parseInt(mainClass.input.next());
+			mainClass.rows = Integer.parseInt(mainClass.input.next());
+			mainClass.cols = Integer.parseInt(mainClass.input.next());
 
-			System.out.println("Rows: " + rows);
-			System.out.println("Cols: " + cols);
+			System.out.println("Rows: " + mainClass.rows);
+			System.out.println("Cols: " + mainClass.cols);
 
-			mainClass.inputData1 = new String[rows][cols];
+			mainClass.inputData = new ArrayList<ArrayList<String>>();
+			mainClass.inputData1 = new ArrayList<ArrayList<String>>();
 			mainClass.examples = new ArrayList<ArrayList<String>>();
-
+			ArrayList<String> temp;
 			String str;
 			int count = 0;
-			for (int i = 0; i < rows; i++) {
+			for (int i = 0; i < mainClass.rows; i++) {
 
-				for (int j = 0; j < cols; j++) {
+				for (int j = 0; j < mainClass.cols; j++) {
 					str = mainClass.input.next();
-					mainClass.inputData1[i][j] = str;
-					ArrayList<String> temp = new ArrayList<String>();
+					temp =  new ArrayList<String>();
+					
+					temp.add("" + count);
+					temp.add("" + j);
+					temp.add("" + i);
+					temp.add("" + str);
+					mainClass.inputData.add(temp);
+					
+					temp = new ArrayList<String>();
 					if (str.equals("+") || str.equals("-")) {
 						temp.add("" + count);
 						temp.add("" + j);
@@ -132,6 +143,8 @@ public class MainClass {
 				}
 			}
 
+			//mainClass.inputData1 = (ArrayList<ArrayList<String>>)mainClass.inputData.clone();
+			
 			// display the example data on screen
 			System.out.println("example Number " + " x1 " + " x2 " + " y ");
 			for (ArrayList<String> strArray : mainClass.examples) {
@@ -191,7 +204,11 @@ public class MainClass {
 			}
 
 			// call function to calculate estimated error
-			mainClass.e = mainClass.calculateError();
+			mainClass.calculateError();
+			
+			//
+			
+			mainClass.deriveLabelFork2();
 
 		}
 
@@ -209,7 +226,16 @@ public class MainClass {
 
 	}
 
-	public float calculateError() {
+	/*
+	 * Function: deriveLabelFork2() will derive the labels for inputdata when k = 2
+	 */
+	
+	public void deriveLabelFork2(){
+		
+		
+	}
+	
+	public void calculateError() {
 		ArrayList<String> temp;
 		int x1, x2;
 		ArrayList<ArrayList<String>> distLabel = null;
@@ -250,9 +276,121 @@ public class MainClass {
 		sigma = (float)Math.sqrt(V);
 		System.out.println("Sigma:: "+sigma);
 		
-		return 0.0f;
+		deriveLabelForInputData();
+		
+		
+		
 	}
 
+	// This Function derives label for input data
+	public void deriveLabelForInputData(){
+		int cnt = 0;
+		int dist = 0;
+		Distance temp = null;
+		dotLabel = new ArrayList<MainClass.Distance>();
+		inputData1 = new ArrayList<ArrayList<String>>();
+		ArrayList<String> strSample = new ArrayList<String>();
+		int x1 = -1;
+		int x2 = -1;
+		String exampleNo = "";
+		String y = "";
+				
+		for (ArrayList<String> arrayList : inputData) {
+			
+			y = arrayList.get(3);
+			exampleNo = arrayList.get(0);
+			x1 = Integer.parseInt(arrayList.get(1));
+			x2 = Integer.parseInt(arrayList.get(2));
+			
+			System.out.println("arrayList:: "+arrayList+" cnt:: "+(++cnt));
+			if(y.equalsIgnoreCase(".")){
+				
+				dotLabel = new ArrayList<MainClass.Distance>();
+				
+				System.out.println("x1::"+x1+" x2::"+x2);
+				for (ArrayList<String> arrayList1 : examples) {
+					int x11 = Integer.parseInt(arrayList1.get(1));
+					int x22 = Integer.parseInt(arrayList1.get(2));
+					dist = (x1 - x11)*(x1 - x11) + (x2 - x22)*(x2 - x22);
+					System.out.println("dist:: "+dist);
+					temp = new Distance();
+					temp.setDistance(dist);
+					temp.setLabel(arrayList1.get(3));
+					
+					dotLabel.add(temp);
+				}
+				
+				System.out.println("Before Sorting: "+dotLabel.toString());
+				Collections.sort(dotLabel, new CustomComparator());
+				System.out.println("Before Sorting: "+dotLabel.toString());
+				
+				
+				int counter = 1;
+				String lbl = dotLabel.get(0).getLabel();
+				int dis = dotLabel.get(0).getDistance();
+				
+				for(int i = 1; i< dotLabel.size(); i++){
+				
+					if(dis != dotLabel.get(i).getDistance()){
+						break;
+					}
+					else{
+						if(lbl.equalsIgnoreCase(dotLabel.get(i).getLabel())){
+							counter ++;
+						}
+						else{
+							if(counter != 0){
+								counter --;
+							}
+							else{
+								lbl = dotLabel.get(i).getLabel();
+								counter++;
+							}
+						}
+					}
+				}
+				
+				
+				if(counter == 0){
+					y = "-";
+					
+				}else{
+					
+					y = lbl;
+					
+				}
+			}
+			strSample = new ArrayList<String>();
+			//strSample.add(exampleNo);
+			strSample.add(Integer.toString(x1));
+			strSample.add(Integer.toString(x2));
+			strSample.add(y);
+			inputData1.add(strSample);
+			
+
+		}
+		
+		/*for (ArrayList<String> strArray : inputData1) {
+			for (String string : strArray) {
+				System.out.print(string + " ");
+			}
+			System.out.println();
+		}*/
+		System.out.println("-------------");
+		System.out.println("k=1 "+" e="+e+" sigma="+sigma);
+		
+		int kg = 0;
+		for(int i=0; i < rows; i++){
+			
+			for(int j=0; j < cols; j++){
+				System.out.print(inputData1.get(kg++).get(2)+" ");
+			}
+			System.out.println("");
+		}
+		
+	}
+	
+	
 	public ArrayList<String> findExample(String str) {
 		System.out.println("Find the string: " + str);
 		for (ArrayList<String> arrayList : examples) {
