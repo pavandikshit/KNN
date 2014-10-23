@@ -168,7 +168,7 @@ public class MainClass {
 					
 					for (int j = count1; j < count1 + partitionVector; j++)
 						strSample.add(strChunks[j]);
-					System.out.println("strSample :: " + strSample);
+					//System.out.println("strSample :: " + strSample);
 					strChunk.add(strSample);
 					count1 = count1 + partitionVector;
 					
@@ -178,13 +178,13 @@ public class MainClass {
 				for (int j = count1; j < strChunks.length; j++)
 					strSample.add(strChunks[j]);
 				if (strSample.size() > 0) {
-					System.out.println("strSample :: " + strSample);
+					//System.out.println("strSample :: " + strSample);
 
 					strChunk.add(strSample);
 				}
 				mainClass.chunks.add(strChunk);
 			}
-			int lmn = 0;
+			/*int lmn = 0;
 			for (ArrayList<ArrayList<String>> str1 : mainClass.chunks) {
 				int pqr = 0;
 				System.out.println("Permutations :" + (++lmn));
@@ -195,16 +195,24 @@ public class MainClass {
 					}
 
 				}
-			}
+			}*/
 
 			// call function to calculate estimated error
-			mainClass.calculateError();
+			mainClass.calculateError(1);
 			
-			//
+			mainClass.calculateError(2);
+			
+			mainClass.calculateError(3);
+			
+			mainClass.calculateError(4);
+			
+			mainClass.calculateError(5);
+			
+			
 			
 			//mainClass.deriveLabelForInputData(1);
 			//mainClass.deriveLabelForInputData(2);
-			mainClass.deriveLabelForInputData(3);
+			//mainClass.deriveLabelForInputData(3);
 			//mainClass.deriveLabelForInputData(4);
 			//mainClass.deriveLabelForInputData(5);
 			
@@ -242,7 +250,7 @@ public class MainClass {
 
 	}
 	
-	public void calculateError() {
+	public void calculateError(int kNearest) {
 		ArrayList<String> temp;
 		int x1, x2;
 		
@@ -262,8 +270,8 @@ public class MainClass {
 					x2 = Integer.parseInt(temp.get(2));
 					y = temp.get(3);
 
-					calculateDistance(x1, x2, y, string);
-					System.out.println(x1 + " " + x2 + " " + y);
+					calculateDistance(x1, x2, y, string, kNearest);
+					//System.out.println(x1 + " " + x2 + " " + y);
 					
 				}
 			}
@@ -271,7 +279,7 @@ public class MainClass {
 			e += ex;
 			E[cnt] = ex;
 			cnt++;
-			System.out.println("Estimated error:: "+ex + " " +cnt);
+		//	System.out.println("Estimated error:: "+ex + " " +cnt);
 		}
 		
 		e = e / t;
@@ -279,17 +287,98 @@ public class MainClass {
 			V += (E[i] - e)*(E[i] - e); 
 		}
 		V = V / (t - 1);
-		System.out.println("Accurate Error:: "+e);
+		//System.out.println("Accurate Error:: "+e);
 		sigma = (float)Math.sqrt(V);
-		System.out.println("Sigma:: "+sigma);
+	//	System.out.println("Sigma:: "+sigma);
 		
-		
+		deriveLabelForInputData(kNearest,e,sigma);
 		
 		
 	}
+	
+	
+	public void calculateDistance(int x1, int x2, String y,
+			ArrayList<String> chunk, int kNearest) {
+		int dist = 0;
+		Distance temp = null;
+		distLabel = new ArrayList<MainClass.Distance>();
+		for (ArrayList<String> arrayList : examples) {
+			if (!chunk.contains(arrayList.get(0))) {
+			//	System.out.println("chunk:: " + chunk);
+			//	System.out.println("arraylist:: " + arrayList.get(0));
+				int x11 = Integer.parseInt(arrayList.get(1));
+				int x22 = Integer.parseInt(arrayList.get(2));
+				dist = (x1 - x11)*(x1 - x11) + (x2 - x22)*(x2 - x22);
+				temp = new Distance();
+				temp.setDistance(dist);
+				temp.setLabel(arrayList.get(3));
+
+				distLabel.add(temp);
+			}
+		}
+		//System.out.println("Before Sorting: "+distLabel.toString());
+		Collections.sort(distLabel, new CustomComparator());
+		//System.out.println("After Sorting: "+distLabel.toString());
+		
+		int counter = 1;
+		String lbl = distLabel.get(0).getLabel();
+		int dis = distLabel.get(0).getDistance();
+		int flag = 1;
+		for(int i = 1; i< distLabel.size(); i++){
+		
+			if(dis != distLabel.get(i).getDistance()){
+				if(flag == k)
+					break;
+				else{
+					flag++;
+					dis = distLabel.get(i).getDistance();
+					
+					if(lbl.equalsIgnoreCase(distLabel.get(i).getLabel())){
+						counter ++;
+					}
+					else{
+						if(counter != 0){
+							counter --;
+						}
+						else{
+							lbl = distLabel.get(i).getLabel();
+							counter++;
+						}
+					}
+				}
+			}
+			else{
+				
+				
+				if(lbl.equalsIgnoreCase(distLabel.get(i).getLabel())){
+					counter ++;
+				}
+				else{
+					if(counter != 0){
+						counter --;
+					}
+					else{
+						lbl = distLabel.get(i).getLabel();
+						counter++;
+					}
+				}
+			}
+		}
+		
+		if(counter == 0){
+			error++;
+			
+		}else{
+			if(!(y.equalsIgnoreCase(lbl))){
+				error++;
+			}
+		}
+		
+		//System.out.println("Error:: "+error);
+	}
 
 	// This Function derives label for input data
-	public void deriveLabelForInputData(int k){
+	public void deriveLabelForInputData(int k, double e, double sigma){
 		int cnt = 0;
 		int dist = 0;
 		Distance temp = null;
@@ -309,17 +398,17 @@ public class MainClass {
 			x1 = Integer.parseInt(arrayList.get(1));
 			x2 = Integer.parseInt(arrayList.get(2));
 			
-			System.out.println("arrayList:: "+arrayList+" cnt:: "+(++cnt));
+			//System.out.println("arrayList:: "+arrayList+" cnt:: "+(++cnt));
 			if(y.equalsIgnoreCase(".")){
 				
 				dotLabel = new ArrayList<MainClass.Distance>();
 				
-				System.out.println("x1::"+x1+" x2::"+x2);
+				//System.out.println("x1::"+x1+" x2::"+x2);
 				for (ArrayList<String> arrayList1 : examples) {
 					int x11 = Integer.parseInt(arrayList1.get(1));
 					int x22 = Integer.parseInt(arrayList1.get(2));
 					dist = (x1 - x11)*(x1 - x11) + (x2 - x22)*(x2 - x22);
-					System.out.println("dist:: "+dist);
+					//System.out.println("dist:: "+dist);
 					temp = new Distance();
 					temp.setDistance(dist);
 					temp.setLabel(arrayList1.get(3));
@@ -327,9 +416,9 @@ public class MainClass {
 					dotLabel.add(temp);
 				}
 				
-				System.out.println("Before Sorting: "+dotLabel.toString());
+			//	System.out.println("Before Sorting: "+dotLabel.toString());
 				Collections.sort(dotLabel, new CustomComparator());
-				System.out.println("After Sorting: "+dotLabel.toString());
+			//	System.out.println("After Sorting: "+dotLabel.toString());
 				
 				
 				int counter = 1;
@@ -419,7 +508,7 @@ public class MainClass {
 	
 	
 	public ArrayList<String> findExample(String str) {
-		System.out.println("Find the string: " + str);
+		//System.out.println("Find the string: " + str);
 		for (ArrayList<String> arrayList : examples) {
 			if (arrayList.get(0).equals(str)) {
 				return arrayList;
@@ -429,65 +518,7 @@ public class MainClass {
 		return null;
 	}
 
-	public void calculateDistance(int x1, int x2, String y,
-			ArrayList<String> chunk) {
-		int dist = 0;
-		Distance temp = null;
-		distLabel = new ArrayList<MainClass.Distance>();
-		for (ArrayList<String> arrayList : examples) {
-			if (!chunk.contains(arrayList.get(0))) {
-				System.out.println("chunk:: " + chunk);
-				System.out.println("arraylist:: " + arrayList.get(0));
-				int x11 = Integer.parseInt(arrayList.get(1));
-				int x22 = Integer.parseInt(arrayList.get(2));
-				dist = (x1 - x11)*(x1 - x11) + (x2 - x22)*(x2 - x22);
-				temp = new Distance();
-				temp.setDistance(dist);
-				temp.setLabel(arrayList.get(3));
-
-				distLabel.add(temp);
-			}
-		}
-		System.out.println("Before Sorting: "+distLabel.toString());
-		Collections.sort(distLabel, new CustomComparator());
-		System.out.println("Before Sorting: "+distLabel.toString());
-		
-		int counter = 1;
-		String lbl = distLabel.get(0).getLabel();
-		int dis = distLabel.get(0).getDistance();
-		
-		for(int i = 1; i< distLabel.size(); i++){
-		
-			if(dis != distLabel.get(i).getDistance()){
-				break;
-			}
-			else{
-				if(lbl.equalsIgnoreCase(distLabel.get(i).getLabel())){
-					counter ++;
-				}
-				else{
-					if(counter != 0){
-						counter --;
-					}
-					else{
-						lbl = distLabel.get(i).getLabel();
-						counter++;
-					}
-				}
-			}
-		}
-		
-		if(counter == 0){
-			error++;
-			
-		}else{
-			if(!(y.equalsIgnoreCase(lbl))){
-				error++;
-			}
-		}
-		
-		System.out.println("Error:: "+error);
-	}
+	
 
 	public class CustomComparator implements Comparator<Distance> {
 
