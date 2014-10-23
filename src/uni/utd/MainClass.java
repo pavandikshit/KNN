@@ -208,7 +208,12 @@ public class MainClass {
 			
 			//
 			
-			mainClass.deriveLabelFork2();
+			//mainClass.deriveLabelForInputData(1);
+			//mainClass.deriveLabelForInputData(2);
+			mainClass.deriveLabelForInputData(3);
+			//mainClass.deriveLabelForInputData(4);
+			//mainClass.deriveLabelForInputData(5);
+			
 
 		}
 
@@ -276,14 +281,13 @@ public class MainClass {
 		sigma = (float)Math.sqrt(V);
 		System.out.println("Sigma:: "+sigma);
 		
-		deriveLabelForInputData();
 		
 		
 		
 	}
 
 	// This Function derives label for input data
-	public void deriveLabelForInputData(){
+	public void deriveLabelForInputData(int k){
 		int cnt = 0;
 		int dist = 0;
 		Distance temp = null;
@@ -294,6 +298,7 @@ public class MainClass {
 		int x2 = -1;
 		String exampleNo = "";
 		String y = "";
+		int flag = 1;
 				
 		for (ArrayList<String> arrayList : inputData) {
 			
@@ -322,19 +327,39 @@ public class MainClass {
 				
 				System.out.println("Before Sorting: "+dotLabel.toString());
 				Collections.sort(dotLabel, new CustomComparator());
-				System.out.println("Before Sorting: "+dotLabel.toString());
+				System.out.println("After Sorting: "+dotLabel.toString());
 				
 				
 				int counter = 1;
 				String lbl = dotLabel.get(0).getLabel();
 				int dis = dotLabel.get(0).getDistance();
-				
+				flag = 1;
 				for(int i = 1; i< dotLabel.size(); i++){
 				
 					if(dis != dotLabel.get(i).getDistance()){
-						break;
+						if(flag == k)
+							break;
+						else{
+							flag++;
+							dis = dotLabel.get(i).getDistance();
+							
+							if(lbl.equalsIgnoreCase(dotLabel.get(i).getLabel())){
+								counter ++;
+							}
+							else{
+								if(counter != 0){
+									counter --;
+								}
+								else{
+									lbl = dotLabel.get(i).getLabel();
+									counter++;
+								}
+							}
+						}
 					}
 					else{
+						
+						
 						if(lbl.equalsIgnoreCase(dotLabel.get(i).getLabel())){
 							counter ++;
 						}
@@ -377,7 +402,7 @@ public class MainClass {
 			System.out.println();
 		}*/
 		System.out.println("-------------");
-		System.out.println("k=1 "+" e="+e+" sigma="+sigma);
+		System.out.println("k= "+k+" e="+e+" sigma="+sigma);
 		
 		int kg = 0;
 		for(int i=0; i < rows; i++){
