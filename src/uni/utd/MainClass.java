@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
 
@@ -52,7 +51,7 @@ public class MainClass {
 
 	}
 
-	@SuppressWarnings("unchecked")
+	
 	public static void main(String[] args) throws IOException {
 		// TODO Auto-generated method stub
 
@@ -143,19 +142,14 @@ public class MainClass {
 				}
 			}
 
-			//mainClass.inputData1 = (ArrayList<ArrayList<String>>)mainClass.inputData.clone();
 			
-			// display the example data on screen
-			System.out.println("example Number " + " x1 " + " x2 " + " y ");
-			for (ArrayList<String> strArray : mainClass.examples) {
-				for (String string : strArray) {
-					System.out.print(string + " ");
-				}
-				System.out.println();
-			}
-
+			
+			
+			//mainClass.displayExamples(); // display the example data on screen
+			
+			
 			int partitionVector = (int) Math
-					.ceil(mainClass.m / mainClass.kFold);
+					.round(mainClass.m / mainClass.kFold);
 			System.out.println("Partition Vector: " + partitionVector);
 
 			ArrayList<String> strSample;
@@ -164,23 +158,23 @@ public class MainClass {
 				strSample = new ArrayList<String>();
 				strChunk = new ArrayList<ArrayList<String>>();
 				partitionVector = (int) Math
-						.ceil(mainClass.m / mainClass.kFold);
+						.round(mainClass.m / mainClass.kFold);
 				String strg = mainClass.tPermutations.get(i);
 				String[] strChunks = strg.split(" ");
 
 				int count1 = 0;
-				for (int l = 0; l < mainClass.kFold; l++) {
+				for (int l = 0; l < mainClass.kFold - 1; l++) {
 					strSample = new ArrayList<String>();
-					if ((strChunks.length - count1) < partitionVector)
-						break;
+					
 					for (int j = count1; j < count1 + partitionVector; j++)
 						strSample.add(strChunks[j]);
 					System.out.println("strSample :: " + strSample);
 					strChunk.add(strSample);
 					count1 = count1 + partitionVector;
+					
 					// strChunk.add(strSample);
 				}
-
+				strSample = new ArrayList<String>();
 				for (int j = count1; j < strChunks.length; j++)
 					strSample.add(strChunks[j]);
 				if (strSample.size() > 0) {
@@ -235,17 +229,25 @@ public class MainClass {
 	 * Function: deriveLabelFork2() will derive the labels for inputdata when k = 2
 	 */
 	
-	public void deriveLabelFork2(){
+	
+	public void displayExamples(){
 		
-		
+		System.out.println("example Number " + " x1 " + " x2 " + " y ");
+		for (ArrayList<String> strArray : examples) {
+			for (String string : strArray) {
+				System.out.print(string + " ");
+			}
+			System.out.println();
+		}
+
 	}
 	
 	public void calculateError() {
 		ArrayList<String> temp;
 		int x1, x2;
-		ArrayList<ArrayList<String>> distLabel = null;
+		
 		String y = "";
-		String label = "";
+		
 		double V = 0;
 		double ex = 0;
 		double E[] = {0,0,0,0,0,0,0,0,0,0,0,0};
@@ -296,14 +298,14 @@ public class MainClass {
 		ArrayList<String> strSample = new ArrayList<String>();
 		int x1 = -1;
 		int x2 = -1;
-		String exampleNo = "";
+		
 		String y = "";
 		int flag = 1;
 				
 		for (ArrayList<String> arrayList : inputData) {
 			
 			y = arrayList.get(3);
-			exampleNo = arrayList.get(0);
+			
 			x1 = Integer.parseInt(arrayList.get(1));
 			x2 = Integer.parseInt(arrayList.get(2));
 			
