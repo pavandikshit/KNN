@@ -177,7 +177,7 @@ public class MainClass {
 				}
 				mainClass.chunks.add(strChunk);
 			}
-			int lmn = 0;
+		//	int lmn = 0;
 		/*	for (ArrayList<ArrayList<String>> str1 : mainClass.chunks) {
 				int pqr = 0;
 				System.out.println("Permutations :" + (++lmn));
@@ -192,7 +192,7 @@ public class MainClass {
 
 			int chunkSize = 10000000;
 			for (ArrayList<ArrayList<String>> str1 : mainClass.chunks) {
-				int pqr = 0;
+				//int pqr = 0;
 				for (ArrayList<String> str2 : str1) {
 					if(str2.size() < chunkSize){
 						chunkSize = str2.size();
@@ -336,8 +336,8 @@ public class MainClass {
 
 		int counter = 1;
 		String lbl = distLabel.get(0).getLabel();
-		int dis = distLabel.get(0).getDistance();
-		int flag = 1;
+		//int dis = distLabel.get(0).getDistance();
+	//	int flag = 1;
 		for(int i = 1; i < kNearest ; i++){
 
 
@@ -389,7 +389,7 @@ public class MainClass {
 		int x2 = -1;
 
 		String y = "";
-		int flag = 1;
+		//int flag = 1;
 
 		for (ArrayList<String> arrayList : inputData) {
 
@@ -423,8 +423,8 @@ public class MainClass {
 
 				int counter = 1;
 				String lbl = dotLabel.get(0).getLabel();
-				int dis = dotLabel.get(0).getDistance();
-				flag = 1;
+			//	int dis = dotLabel.get(0).getDistance();
+			//	flag = 1;
 				for(int i = 1; i < k; i++){
 
 					if(lbl.equalsIgnoreCase(dotLabel.get(i).getLabel())){
